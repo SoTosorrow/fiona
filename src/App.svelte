@@ -1,45 +1,76 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg'
-  import Counter from './lib/Counter.svelte'
+    import Node from "./lib/node";
+
+    let nodes: any = [];
+
+    let init = () => {
+        console.log("init...");
+
+        nodes.push(new Node());
+        nodes.push(new Node());
+        nodes.push(new Node());
+        console.log(nodes);
+    };
+
+    let current_active_item = null;
+    let activeItem=(item)=>{
+        if(current_active_item){
+            current_active_item.view.children[0].style.fill = '#ddd';
+        }
+        current_active_item = item;
+        item.view.children[0].style.fill = 'red';
+    }
+
+    let view_stat = false;
+    let sceneMouseDown = (e)=>{
+        console.log('down');
+        view_stat = true;
+    }
+    let sceneMouseUp = (e)=>{
+        console.log('up');
+        view_stat = false;
+    }
+    let sceneMouseMove = (e)=>{
+        if(view_stat === true && current_active_item){
+            current_active_item.view.children[0].style.fill = `#${e.clientY}`;
+            current_active_item.view.children[0].style.transform =`translate(${e.clientX}px, ${e.clientY}px)`;
+            current_active_item.view.children[0].style.x = '0'
+            current_active_item.view.children[0].style.y = '0'
+        }
+    }
+
+
+    init();
 </script>
 
-<main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer"> 
-      <img src="/vite.svg" class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer"> 
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
-
-  <div class="card">
-    <Counter />
-  </div>
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
+<main style="background-color:gray">
+    <div class="font" style="padding: 2vw 0 0 5vw">Fiona</div>
+    <svg id="view" width="100vw" height="100vh" style="margin:0;"
+        on:mousedown={sceneMouseDown}
+        on:mouseup={sceneMouseUp}
+        on:mousemove={sceneMouseMove}
+    >
+        {#each nodes as node}
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <g 
+                bind:this={node.view}
+                on:click={ ()=>{ activeItem(node) } }>
+                
+                <rect
+                    x={node.x + "px"}
+                    y={node.y + "px"}
+                    rx="5px"
+                    width="100"
+                    height="40"
+                    fill="#ddd"
+                    stroke="black"
+                    stroke-width=2
+                    transform="translate(0, 0)"
+                />
+            </g>
+        {/each}
+    </svg>
 </main>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
 </style>
