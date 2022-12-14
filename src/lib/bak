@@ -1,47 +1,72 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import Node from "./lib/node";
-    import NodeView from "./lib/NodeView.svelte";
 
-    let nodes: any = [];
+    let id: number = Math.random();
+    let x: number = Math.random() * 200;
+    let y: number = Math.random() * 200;
+    let view:any = null;
+
+    let onClick = ()=>{
+        console.log(id);
+    }
+    export let activeItem;
+</script>
+
+
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<g
+    bind:this={view}
+    on:click={ ()=>{ activeItem() } }
+>
+
+    <rect
+        x={x + "px"}
+        y={y + "px"}
+        rx="5px"
+        width="100"
+        height="40"
+        fill="#ddd"
+        stroke="black"
+        stroke-width=2
+        transform="translate(0, 0)"
+    />
+</g>
+
+<!-- <script lang="ts">
+    import Node from "./lib/Node.svelte";
+
+    let nodes: any = [1,2,3];
 
     let init = () => {
         console.log("init...");
-        for(let i=0;i<100;i++){
-
-            nodes.push(new Node());
-        }
     };
 
     let current_active_item = null;
     let addItem = ()=>{
-        nodes = [...nodes, new Node()];
-
+        console.log(1);
+        nodes = [...nodes, 1];
     }
     let activeItem=(item)=>{
-        console.log(item);
-        
         // if(current_active_item){
         //     current_active_item.view.children[0].style.fill = '#ddd';
         // }
         // current_active_item = item;
         // item.view.children[0].style.fill = 'red';
+        console.log(item);
+        
     }
 
     let view_stat = false;
     let sceneMouseDown = (e)=>{
-        // console.log('down');
+        console.log('down');
         if(e.which == '1'){
             view_stat = true;
         }
         if(e.which == '3'){
-            // addItem();
-            console.log(nodes);
-            nodes[0].fill = 'red'
+            addItem();
         }
     }
     let sceneMouseUp = (e)=>{
-        // console.log('up');
+        console.log('up');
         view_stat = false;
     }
     let sceneMouseMove = (e)=>{
@@ -52,37 +77,23 @@
             current_active_item.view.children[0].style.y = '0'
         }
     }
-    let print=(item)=>{
-        console.log(item);
-        item.fill = 'blue'
-        nodes = nodes;
-    }
 
-    
 
     init();
 </script>
 
 <main style="height:100vh;width:100vw;">
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <svg id="view" width="1000" height="900" style="margin:0;background-color:gray;"
         on:mousedown={sceneMouseDown}
         on:mouseup={sceneMouseUp}
         on:mousemove={sceneMouseMove}
     >
-        <!-- <text x="100" y="100" class="font" style="margin:0;">Fiona</text> -->
         {#each nodes as node}
-            <NodeView 
-                x={node.x} 
-                y={node.y} 
-                id={node.id} 
-                fill={node.fill}
-                on:click={()=>{print(node)}}
-            />
+           <Node activeItem={()=>{activeItem(node)}}/>
+          
         {/each}
-
     </svg>
 </main>
 
 <style>
-</style>
+</style> -->

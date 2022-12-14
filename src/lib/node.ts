@@ -2,13 +2,15 @@ export default class Node {
     id:number;
     x:number;
     y:number;
-    view:any;
+    fill:string;
+    // view:any;
 
     constructor(){
         // this.id = _id;
         this.id= Math.random();
-        this.x = Math.random() * 200;
-        this.y = Math.random() * 200;
+        this.x = Math.random() * 600;
+        this.y = Math.random() * 600;
+        this.fill = '#ddd'
     }
 
     onClick(){
@@ -18,3 +20,4 @@ export default class Node {
 
     // }
 }
+
