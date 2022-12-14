@@ -1,27 +1,27 @@
 <script lang="ts">
-    import { createEventDispatcher, onMount } from 'svelte';
+    import { afterUpdate, beforeUpdate } from "svelte";
+
+
     export let id;
     export let x;
     export let y;
     export let fill;
-    // export let view;
-    // const dispatch = createEventDispatcher();
-    // export let func;
-    // export let activeItem;
-    onMount(()=>{
-        console.log(fill);
-        
-    })
     
     let onClick = ()=>{
         console.log(id);
     }
+    // beforeUpdate(()=>{
+    //     console.log(fill);
+    // })
+    // afterUpdate(()=>{
+    //     console.log(fill);
+    // })
+    
 
 </script>
 
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- bind:this={view} -->
 <g
     on:click
 >

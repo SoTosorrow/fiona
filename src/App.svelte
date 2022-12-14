@@ -2,16 +2,19 @@
     import { onMount } from "svelte";
     import Node from "./lib/node";
     import NodeView from "./lib/NodeView.svelte";
+    import { active_item, active_item_sub } from "./lib/stores";
+
+
 
     let nodes: any = [];
 
-    let init = () => {
+    onMount(()=>{
         console.log("init...");
-        for(let i=0;i<100;i++){
-
+        for(let i=0;i<5;i++){
             nodes.push(new Node());
         }
-    };
+        nodes = nodes
+    })
 
     let current_active_item = null;
     let addItem = ()=>{
@@ -20,12 +23,6 @@
     }
     let activeItem=(item)=>{
         console.log(item);
-        
-        // if(current_active_item){
-        //     current_active_item.view.children[0].style.fill = '#ddd';
-        // }
-        // current_active_item = item;
-        // item.view.children[0].style.fill = 'red';
     }
 
     let view_stat = false;
@@ -34,10 +31,10 @@
         if(e.which == '1'){
             view_stat = true;
         }
-        if(e.which == '3'){
-            // addItem();
-            console.log(nodes);
-            nodes[0].fill = 'red'
+        if(e.which == '2'){
+            addItem();
+            console.log(active_item);
+            
         }
     }
     let sceneMouseUp = (e)=>{
@@ -52,15 +49,15 @@
             current_active_item.view.children[0].style.y = '0'
         }
     }
-    let print=(item)=>{
-        console.log(item);
+    let itemClick=(item)=>{
+        console.log(item.style);
+        active_item_sub.set(item)
         item.fill = 'blue'
         nodes = nodes;
     }
 
     
 
-    init();
 </script>
 
 <main style="height:100vh;width:100vw;">
@@ -70,14 +67,13 @@
         on:mouseup={sceneMouseUp}
         on:mousemove={sceneMouseMove}
     >
-        <!-- <text x="100" y="100" class="font" style="margin:0;">Fiona</text> -->
         {#each nodes as node}
             <NodeView 
                 x={node.x} 
                 y={node.y} 
                 id={node.id} 
                 fill={node.fill}
-                on:click={()=>{print(node)}}
+                on:click={()=>{itemClick(node)}}
             />
         {/each}
 
