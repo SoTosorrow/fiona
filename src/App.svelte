@@ -2,10 +2,12 @@
     import { onMount } from "svelte";
     import Node from "./lib/node";
     import NodeView from "./lib/NodeView.svelte";
+    import Context from "./lib/Context.svelte";
 
-    let nodes: any = [];
+    let nodes: any = [];    // @todo -> map
     let view_stat = false;
     let active_item = null;
+    let enable_context = false;
 
     onMount(()=>{
         console.log("init...");
@@ -23,6 +25,10 @@
             node.enable = false;
             sceneUpdateForce(); 
         }
+        // 删除后排序混乱
+        // nodes = nodes.filter((i)=>{
+        //     return i !== node;
+        // });
     }
     let sceneUpdateForce = ()=>{
         nodes = nodes;
@@ -57,18 +63,29 @@
         active_item.onActive();
         sceneUpdateForce();
     }
+    let enableContext=()=>{
+        console.log(111);
+        enable_context = !enable_context;
+    }
 
     
 
 </script>
 
-<main style="height:100vh;width:100vw;">
+<main style="height:100vh;width:100vw;"
+    on:contextmenu|preventDefault="{enableContext}"
+>
+    {#if enable_context}
+        <Context/>
+    {/if}
+
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <svg id="view" width="1000" height="900" style="margin:0;background-color:gray;"
         on:mousedown={sceneMouseDown}
         on:mouseup={sceneMouseUp}
         on:mousemove={sceneMouseMove}
     >
+        <text class="font" x='100' y='100'>Finoa</text>
         {#each nodes as node}
             {#if node.enable}
                 <NodeView 
@@ -77,7 +94,6 @@
                     y={node.y} 
                     bind:view={node.view}
                     on:click={()=>{itemClick(node)}}
-                    
                 />
             {/if}
         {/each}

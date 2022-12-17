@@ -35,9 +35,7 @@ export default class Node implements ItemView, ItemUse {
         this.view.children[0].style.fill = '#ddd';
     }
     onMove(clientX: number, clientY: number) {
-        this.view.children[0].style.transform = `translate(${clientX}px, ${clientY}px)`;
-        this.view.children[0].style.x = '0'
-        this.view.children[0].style.y = '0'
+        this.view.style.transform = `translate(${clientX}px, ${clientY}px)`;
     }
 }
 
