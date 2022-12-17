@@ -2,58 +2,60 @@
     import { onMount } from "svelte";
     import Node from "./lib/node";
     import NodeView from "./lib/NodeView.svelte";
-    import { active_item, active_item_sub } from "./lib/stores";
-
-
 
     let nodes: any = [];
+    let view_stat = false;
+    let active_item = null;
 
     onMount(()=>{
         console.log("init...");
         for(let i=0;i<5;i++){
             nodes.push(new Node());
         }
-        nodes = nodes
+        sceneUpdateForce();
     })
 
-    let current_active_item = null;
-    let addItem = ()=>{
+    let sceneAddNode = ()=>{
         nodes = [...nodes, new Node()];
-
     }
-    let activeItem=(item)=>{
-        console.log(item);
+    let sceneDelNode = (node)=>{
+        if(node){
+            node.enable = false;
+            sceneUpdateForce(); 
+        }
+    }
+    let sceneUpdateForce = ()=>{
+        nodes = nodes;
     }
 
-    let view_stat = false;
     let sceneMouseDown = (e)=>{
-        // console.log('down');
         if(e.which == '1'){
             view_stat = true;
         }
         if(e.which == '2'){
-            addItem();
-            console.log(active_item);
-            
+            sceneAddNode();
+        }
+        if(e.which == '3'){
+            sceneDelNode(active_item);
+            active_item = null;
         }
     }
     let sceneMouseUp = (e)=>{
-        // console.log('up');
         view_stat = false;
     }
     let sceneMouseMove = (e)=>{
-        if(view_stat === true && current_active_item){
-            current_active_item.view.children[0].style.fill = `#${e.clientY}`;
-            current_active_item.view.children[0].style.transform =`translate(${e.clientX}px, ${e.clientY}px)`;
-            current_active_item.view.children[0].style.x = '0'
-            current_active_item.view.children[0].style.y = '0'
+        if(view_stat === true && active_item){
+            active_item.view.children[0].style.fill = `#${e.clientY}`;
+            active_item.onMove(e.clientX,e.clientY)
         }
     }
     let itemClick=(item)=>{
-        console.log(item.style);
-        active_item_sub.set(item)
-        item.fill = 'blue'
-        nodes = nodes;
+        if(active_item) {
+            active_item.onDisActive();
+        }
+        active_item = item;
+        active_item.onActive();
+        sceneUpdateForce();
     }
 
     
@@ -68,13 +70,16 @@
         on:mousemove={sceneMouseMove}
     >
         {#each nodes as node}
-            <NodeView 
-                x={node.x} 
-                y={node.y} 
-                id={node.id} 
-                fill={node.fill}
-                on:click={()=>{itemClick(node)}}
-            />
+            {#if node.enable}
+                <NodeView 
+                    id={node.id}
+                    x={node.x} 
+                    y={node.y} 
+                    bind:view={node.view}
+                    on:click={()=>{itemClick(node)}}
+                    
+                />
+            {/if}
         {/each}
 
     </svg>
