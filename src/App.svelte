@@ -5,8 +5,7 @@
     import Context from "./lib/Context.svelte";
 
     let nodes: any = [];    // @todo -> map
-    let view_stat = false;
-    let active_item = null;
+    let active_item_view = null;
     let enable_context = false;
 
     onMount(()=>{
@@ -21,10 +20,6 @@
         nodes = [...nodes, new Node()];
     }
     let sceneDelNode = (node)=>{
-        if(node){
-            node.enable = false;
-            sceneUpdateForce(); 
-        }
         // 删除后排序混乱
         // nodes = nodes.filter((i)=>{
         //     return i !== node;
@@ -35,42 +30,53 @@
     }
 
     let sceneMouseDown = (e)=>{
-        if(e.which == '1'){
-            view_stat = true;
-        }
         if(e.which == '2'){
             sceneAddNode();
         }
-        if(e.which == '3'){
-            sceneDelNode(active_item);
-            active_item = null;
+        if(e.which == '3' && e.target.parentNode.localName === 'g'){
+            e.target.parentNode.style.display = "none";
         }
+
+        // 可以直接定位到点击元素
+        if(e.target.nodeName === 'svg'){
+            active_item_view = null;
+            return;
+        }
+        // tmp search Node
+        if(e.target.parentNode.localName !== 'g'){
+            return;
+        }
+        if(e.which == '1'){
+            active_item_view = e.target.parentNode;
+        }
+
+
     }
     let sceneMouseUp = (e)=>{
-        view_stat = false;
+        active_item_view = null;
     }
     let sceneMouseMove = (e)=>{
-        if(view_stat === true && active_item){
-            active_item.view.children[0].style.fill = `#${e.clientY}`;
-            active_item.onMove(e.clientX,e.clientY)
+        if(active_item_view){
+            active_item_view.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+            // @test
+            active_item_view.children[0].style.fill = `#${e.clientY}`;
         }
-    }
-    let itemClick=(item)=>{
-        if(active_item) {
-            active_item.onDisActive();
-        }
-        active_item = item;
-        active_item.onActive();
-        sceneUpdateForce();
     }
     let enableContext=()=>{
-        console.log(111);
         enable_context = !enable_context;
     }
-
+    let activeItem =(item)=>{
+        active_item_view = item.view
+        console.log(active_item_view);
+    }
+    let print=()=>{
+        return;
+    }
     
 
 </script>
+
+<!-- @todo svg-viewBox -->
 
 <main style="height:100vh;width:100vw;"
     on:contextmenu|preventDefault="{enableContext}"
@@ -84,8 +90,10 @@
         on:mousedown={sceneMouseDown}
         on:mouseup={sceneMouseUp}
         on:mousemove={sceneMouseMove}
+        on:mouseleave={print}
     >
         <text class="font" x='100' y='100'>Finoa</text>
+
         {#each nodes as node}
             {#if node.enable}
                 <NodeView 
@@ -93,7 +101,7 @@
                     x={node.x} 
                     y={node.y} 
                     bind:view={node.view}
-                    on:click={()=>{itemClick(node)}}
+                    on:click={()=>{activeItem(node)}}
                 />
             {/if}
         {/each}

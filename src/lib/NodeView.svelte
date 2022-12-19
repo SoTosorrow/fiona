@@ -6,6 +6,7 @@
     export let x: number;
     export let y: number;
     export let view: any;
+    // export let enable: true;
 
     // let input_sockets: Map<number,Socket>;
     // let ouput_sockets: Map<number,Socket>;
@@ -42,6 +43,7 @@
         stroke-width="2"
         transform="translate(0, 0)"
     />
+        <!-- display={enable?'block':'none'} -->
     {#each input_sockets as socket, index(index)}
         <circle 
             cy={12*index+8}
@@ -49,7 +51,7 @@
             fill='green'
         />
     {/each}
-    {#each input_sockets as socket, index(index)}
+    {#each ouput_sockets as socket, index(index)}
         <circle 
             cy={12*index+8}
             cx=100 
@@ -58,4 +60,5 @@
             on:click={onClick}
         />
     {/each}
+    <!-- <g style="pointer-event:none"></g> -->
 </g>

@@ -1,9 +1,9 @@
 interface ItemView {
     view: any;
-    enable: boolean;
 }
 
 interface ItemUse {
+    enable: boolean;
     onActive(): void;
     onDisActive(): void;
 }
