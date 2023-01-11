@@ -26,6 +26,9 @@
             ouput_sockets = [...ouput_sockets, new Socket];
         }
         view.style.transform = `translate(${x}px, ${y}px)`;
+        // use to search node from view
+        view.setAttribute('id', id)
+        
     })
 </script>
 
@@ -57,7 +60,6 @@
             cx=100 
             r='5' 
             fill='red'
-            on:click={onClick}
         />
     {/each}
     <!-- <g style="pointer-event:none"></g> -->

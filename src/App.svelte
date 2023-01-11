@@ -5,8 +5,12 @@
     import Context from "./lib/Context.svelte";
 
     let nodes: any = [];    // @todo -> map
+    let links: any = [];
     let active_item_view = null;
     let enable_context = false;
+    let is_link = false;
+    let global_start_item = {x:0,y:0};
+    let global_end_item = {x:0,y:0};
 
     onMount(()=>{
         console.log("init...");
@@ -19,6 +23,13 @@
     let sceneAddNode = ()=>{
         nodes = [...nodes, new Node()];
     }
+    let sceneAddLink = (end_item)=>{
+        let link = {
+            start_item: global_start_item,
+            end_item: end_item,
+        }
+        links = [...links,link]
+    }
     let sceneDelNode = (node)=>{
         // 删除后排序混乱
         // nodes = nodes.filter((i)=>{
@@ -30,6 +41,8 @@
     }
 
     let sceneMouseDown = (e)=>{
+        console.log(e.target);
+        
         if(e.which == '2'){
             sceneAddNode();
         }
@@ -43,19 +56,48 @@
             return;
         }
         // tmp search Node
-        if(e.target.parentNode.localName !== 'g'){
-            return;
-        }
-        if(e.which == '1'){
+        if(e.which == '1' && e.target.localName ==='rect'){
             active_item_view = e.target.parentNode;
         }
+        // 点击socket 进入连线模式
+        if(e.which == '1' && e.target.localName ==='circle'){
+            // socket相对偏移
+            let offsetx = e.target.cx.baseVal.value;
+            let offsety = e.target.cy.baseVal.value;
+            
+            let transform = e.target.parentNode.style.transform;
+            let x = /translate\((.*)\px,/.exec(transform)[1].trim()
+            let y = /\,(.*)px/.exec(transform)[1].trim()
 
+            global_start_item = {
+                x:Number(x) + offsetx, 
+                y:Number(y) + offsety
+            };
+            is_link = true;
+        }
 
     }
     let sceneMouseUp = (e)=>{
+        if(is_link){
+            let offsetx = e.target.cx.baseVal.value;
+            let offsety = e.target.cy.baseVal.value;
+            
+            let transform = e.target.parentNode.style.transform;
+            let x = /translate\((.*)\px,/.exec(transform)[1].trim()
+            let y = /\,(.*)px/.exec(transform)[1].trim()
+            let end_item = {
+                x:Number(x) + offsetx, 
+                y:Number(y) + offsety
+            };
+            sceneAddLink(end_item)
+        }
+        // console.log(e.target);
         active_item_view = null;
+        is_link = false;
     }
     let sceneMouseMove = (e)=>{
+        global_end_item.x = e.clientX;
+        global_end_item.y = e.clientY;
         if(active_item_view){
             active_item_view.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
             // @test
@@ -92,7 +134,16 @@
         on:mousemove={sceneMouseMove}
         on:mouseleave={print}
     >
+
         <text class="font" x='100' y='100'>Finoa</text>
+        {#if is_link}
+            <line 
+                x1={global_start_item.x} 
+                y1={global_start_item.y} 
+                x2={global_end_item.x} 
+                y2={global_end_item.y} 
+                stroke='black' stroke-width=2/>
+        {/if}
 
         {#each nodes as node}
             {#if node.enable}
@@ -101,11 +152,26 @@
                     x={node.x} 
                     y={node.y} 
                     bind:view={node.view}
-                    on:click={()=>{activeItem(node)}}
+                    on:click={()=>{print()}}
                 />
             {/if}
         {/each}
+        {#each links as link}
+            <line 
+            x1={link.start_item.x} 
+            y1={link.start_item.y} 
+            x2={link.end_item.x} 
+            y2={link.end_item.y} 
+            stroke='black' stroke-width=2/>
+        {/each}
 
+        <!-- <foreignObject x="100" y="25" 
+            width="160" height="160"> 
+            <div> 
+                I love Hsh
+                <button>button</button>
+            </div> 
+        </foreignObject> -->
     </svg>
 </main>
 
